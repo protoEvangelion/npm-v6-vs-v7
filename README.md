@@ -66,14 +66,23 @@ Observe npm v7 fails npm install and does not install @angular/common v13.x:
 
 ![v7fail](./v7/v7fail.png)
 
-To get around the error add this to `package.json`:
+To get around this new peer dep error, that's where the `overrides` solution comes in with npm v8.
 
 ```
-  "overrides": {
-    "@perfectmemory/ngx-contextmenu": {
-      "@angular/common": "$@angular/common"
-    }
-  },
+cd v8
+npm i npm@8 -g
+npm -v # 8.x.x
+npm i @angular/common@13
 ```
 
-Run this again & observe that peer dependency error goes away but you still have other peer dep errors. Now you could add the other deps to the overrides object OR just install the peer dep your dependency is asking for.
+Notice we already have the overrides listed in the v8/package.json but we still get the peer dep errors.
+
+That is because overrides require you to manually install a dependency if it is listed as an override.
+
+```
+npm i @angular/common@13 @angular/core@13 @angular/cdk@13
+```
+
+Notice, npm finally succeeds to install. If you inspect `./v8/node_modules/@angular/common/package.json`, it's version is 13.x. Additionally if you navigate to `./v8/node_modules/@perfectmemory/ngx-contextmenu` notice there is no @angular/common@14 module because we overrode it.
+
+> This is just a temporary workaround to fix a peer dep error. The best solution is the upgrade either your dependency, or the peer dependency that is being requested.
